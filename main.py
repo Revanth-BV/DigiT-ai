@@ -244,10 +244,29 @@ def load_presence(user_id):
 
 def save_presence(user_id, presence):
 
-    presence["user_id"] = user_id
+    safe_presence = {
+
+        "user_id": user_id,
+
+        "energy": float(
+            presence.get("energy", 50)
+        ),
+
+        "warmth": float(
+            presence.get("warmth", 60)
+        ),
+
+        "reflection": float(
+            presence.get("reflection", 50)
+        ),
+
+        "tension": float(
+            presence.get("tension", 20)
+        )
+    }
 
     supabase.table("presence_states") \
-        .upsert(presence) \
+        .upsert(safe_presence) \
         .execute()
 
 # ==========================================
@@ -519,7 +538,28 @@ IMPORTANT:
 - Behavior patterns should accumulate over time
 - Detect subtle emotional signals
 - Avoid repeating identical states unless necessary
-- Return ONLY valid JSON
+IMPORTANT:
+Return ONLY raw valid JSON.
+
+Do NOT use markdown.
+Do NOT explain anything.
+Do NOT include headings.
+Do NOT include analysis text.
+Do NOT include notes.
+
+Return ONLY this schema:
+
+{
+  "stable_traits": [],
+  "emotional_state": "",
+  "core_drivers": [],
+  "current_focus": "",
+  "behavior_patterns": [],
+  "emotional_trend": "Stable",
+  "confidence_level": 50,
+  "stress_level": 50,
+  "onboarding_completed": true
+}
 
 CURRENT IDENTITY:
 {identity}
@@ -582,7 +622,7 @@ The updated identity should feel alive and adaptive.
             print("JSON EXTRACTION ERROR:")
             print(json_error)
 
-            return
+            updated_identity = identity
 
         # ==========================================
         # ADVANCED EMOTIONAL DETECTION
@@ -886,12 +926,26 @@ def update_presence_state(user_message,user_id):
     # LIMITS
     # ==========================================
 
-    for key in presence:
+    numeric_keys = [
+    "energy",
+    "warmth",
+    "reflection",
+    "tension"
+    ]
 
-        presence[key] = max(
-            0,
-            min(100, presence[key])
-        )
+    for key in numeric_keys:
+
+        try:
+            value = float(presence.get(key, 50))
+
+            presence[key] = max(
+                0,
+                min(100, value)
+            )
+
+        except Exception:
+
+            presence[key] = 50
     # ==========================================
     # EMOTIONAL NORMALIZATION
     # ==========================================
