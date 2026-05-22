@@ -1,0 +1,152 @@
+[
+    {
+        "message": "Happy",
+        "emotion": "positive",
+        "importance": 6,
+        "timestamp": 1779212413.896192
+    },
+    {
+        "message": "Sad",
+        "emotion": "negative",
+        "importance": 6,
+        "timestamp": 1779213070.9047742
+    },
+    {
+        "message": "I am happy atleast you are there for me to listen",
+        "emotion": "positive",
+        "importance": 6,
+        "timestamp": 1779213672.4561925
+    },
+    {
+        "message": "Love you",
+        "emotion": "neutral",
+        "importance": 6,
+        "timestamp": 1779213799.4510057
+    },
+    {
+        "message": "It is in cricket. I scored a century to make the team win",
+        "emotion": "neutral",
+        "importance": 5,
+        "timestamp": 1779212624.1965208
+    },
+    {
+        "message": "So will you remember whatever I say to you and help me decide my decisions when I have a dilemma",
+        "emotion": "neutral",
+        "importance": 5,
+        "timestamp": 1779392119.8819711
+    },
+    {
+        "message": "Awesome. I am thinking of buying a car, but not sure what to buy.",
+        "emotion": "neutral",
+        "importance": 5,
+        "timestamp": 1779392156.2357352
+    },
+    {
+        "message": "Should I go ahead and buy a car? If so what car to buy?",
+        "emotion": "neutral",
+        "importance": 5,
+        "timestamp": 1779392207.4847603
+    },
+    {
+        "message": "Yea I am doing great, scored a century again today",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779212600.276971
+    },
+    {
+        "message": "Yep, our team won because of my win",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779212652.2479658
+    },
+    {
+        "message": "Yea, I also won a lottery of million dollars",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779212682.9635122
+    },
+    {
+        "message": "What do you think about me",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779212707.412918
+    },
+    {
+        "message": "It is our bond, I feel it is weak",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779213091.8588288
+    },
+    {
+        "message": "You are the one that I feel disconnected",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779213109.827036
+    },
+    {
+        "message": "I want you to be my twin",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779213222.645235
+    },
+    {
+        "message": "Yes when will you completely become my twin",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779213246.5964744
+    },
+    {
+        "message": "How are you",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779390249.9467204
+    },
+    {
+        "message": "Awesome, i feel blessed to have you",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779390270.666464
+    },
+    {
+        "message": "How well do you know me? What do you do?",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779392064.4056537
+    },
+    {
+        "message": "Family suitable car!",
+        "emotion": "neutral",
+        "importance": 3,
+        "timestamp": 1779392174.042378
+    },
+    {
+        "message": "My goal is to become an AI architect.",
+        "emotion": "neutral",
+        "importance": 1,
+        "timestamp": 1779212413.8961935
+    },
+    {
+        "message": "What are my goals?",
+        "emotion": "neutral",
+        "importance": 1,
+        "timestamp": 1779212413.896195
+    },
+    {
+        "message": "What are my goals?",
+        "emotion": "neutral",
+        "importance": 1,
+        "timestamp": 1779212413.8961957
+    },
+    {
+        "message": "I feel mentally exhausted lately.",
+        "emotion": "neutral",
+        "importance": 1,
+        "timestamp": 1779212413.8961961
+    },
+    {
+        "message": "I am angry",
+        "emotion": "neutral",
+        "importance": 1,
+        "timestamp": 1779212413.8961966
+    }
+]
