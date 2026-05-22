@@ -45,9 +45,8 @@ client = OpenAI(
     api_key=os.getenv("GROQ_API_KEY"),
     base_url="https://api.groq.com/openai/v1"
 )
-SUPABASE_URL = "https://qyuvvsdutdhvjallpzpk.supabase.co"
-
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF5dXZ2c2R1dGRodmphbGxwenBrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTM5MDUyNiwiZXhwIjoyMDk0OTY2NTI2fQ.79Dp1r_ryN-mEiZn5pBq764zq93VosqSqxiryI2V3TQ"
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 supabase = create_client(
     SUPABASE_URL,
@@ -203,9 +202,9 @@ def load_identity(user_id):
         "behavior_patterns": [],
         "emotional_trend": "Stable",
         "confidence_level": 50,
-        "stress_level": 50
+        "stress_level": 50,
+        "onboarding_completed": False
     }
-    "onboarding_completed": False
 
 def save_identity(user_id, identity):
 
