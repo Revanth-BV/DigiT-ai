@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 import Onboarding from "./Onboarding";
 import { supabase } from "./supabase";
@@ -85,7 +85,7 @@ function App({ session }) {
 
     const response = await fetch(
 
-      `http://127.0.0.1:8000/identity/${session.user.id}`
+      `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
     );
 
     const data = await response.json();
@@ -117,7 +117,7 @@ function App({ session }) {
 
       const response = await fetch(
 
-        `http://127.0.0.1:8000/identity/${session.user.id}`
+        `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
       );
 
       const identity = await response.json();
@@ -134,7 +134,7 @@ function App({ session }) {
 
       await fetch(
 
-        "http://127.0.0.1:8000/save-identity",
+        "https://digit-ai-production.up.railway.app/save-identity",
 
         {
           method: "POST",
@@ -207,7 +207,7 @@ const sendMessage = async () => {
 
     const response = await fetch(
 
-      "http://127.0.0.1:8000/stream-chat",
+      "https://digit-ai-production.up.railway.app/stream-chat",
 
       {
         method: "POST",
