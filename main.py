@@ -508,7 +508,7 @@ def update_identity_profile(user_message,user_id):
 
     identity = load_identity(user_id)
 
-    analysis_prompt = f"""
+    analysis_prompt = """
 You are an advanced psychological identity analyzer.
 
 Analyze the user's message deeply.
@@ -1062,7 +1062,7 @@ def chat(req: ChatRequest):
     # DIGIT SYSTEM PROMPT
     # ==========================================
 
-    system_prompt = f"""
+    system_prompt = """
 You are DigiT.
 
 You are the user's evolving digital twin.
@@ -1220,7 +1220,7 @@ async def stream_chat(req: ChatRequest):
 
     relevant_memories = get_relevant_memories(req.message)
 
-    system_prompt = f"""
+    system_prompt = """
 You are DigiT.
 
 You are the user's evolving digital twin.
