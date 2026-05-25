@@ -124,6 +124,16 @@ def save_memory(user_id, memory):
 
         }).execute()
 
+def save_chat_message(user_id, role, content):
+
+    supabase.table("chat_history").insert({
+
+        "user_id": user_id,
+        "role": role,
+        "content": content
+
+    }).execute()
+
 def load_long_term_memory():
 
     if not os.path.exists(LONG_TERM_MEMORY_FILE):
@@ -993,6 +1003,16 @@ async def get_identity(user_id: str):
     identity = load_identity(user_id)
 
     return identity
+
+@app.get("/chat-history/{user_id}")
+def get_chat_history(user_id: str):
+    result = supabase.table("chat_history") \
+        .select("*") \
+        .eq("user_id", user_id) \
+        .order("created_at") \
+        .execute()
+
+    return result.data
 # ==========================================
 # CHAT ROUTE
 # ==========================================
@@ -1031,7 +1051,11 @@ def chat(req: ChatRequest):
     }
 
     memory.append(user_message)
-
+    save_chat_message(
+    req.user_id,
+    "assistant",
+    reply
+)
     # MEMORY EXTRACTION
 
     extract_important_memory(req.message)
@@ -1173,7 +1197,11 @@ without directly repeating the profile.
     }
 
     memory.append(assistant_message)
-
+    save_chat_message(
+        req.user_id,
+        "assistant",
+        reply
+    )
     save_memory(req.user_id, memory)
 
     # ==========================================
@@ -1198,8 +1226,12 @@ async def stream_chat(req: ChatRequest):
         "role": "user",
         "content": req.message
     }
-
     memory.append(user_message)
+    save_chat_message(
+        req.user_id,
+        "user",
+        req.message
+    )
 
     extract_important_memory(req.message)
 
@@ -1328,6 +1360,11 @@ without directly repeating the profile.
         }
 
         memory.append(assistant_message)
+        save_chat_message(
+            req.user_id,
+            "assistant",
+            full_response
+        )
 
         try:
 

@@ -677,3 +677,50 @@ body {
     opacity: 0.4;
   }
 }
+
+@media (max-width: 768px) {
+
+  .sidebar {
+
+    width: 100%;
+    right: -100%;
+  }
+
+  .sidebar.open {
+
+    right: 0;
+  }
+
+  .chat-box {
+
+    padding: 20px;
+  }
+
+  .user-message,
+  .ai-message {
+
+    max-width: 90%;
+  }
+
+  .header {
+
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .header-actions {
+
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .input-area {
+
+    padding: 12px;
+  }
+
+  .input-area input {
+
+    font-size: 16px;
+  }
+}

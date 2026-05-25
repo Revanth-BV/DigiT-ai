@@ -32,7 +32,49 @@ function App({ session }) {
   ]);
 
   const [loading, setLoading] = useState(false);
+  
+  const loadChatHistory = async () => {
 
+  if (!session?.user?.id) return;
+
+  try {
+
+    const response = await fetch(
+      `https://digit-ai-production.up.railway.app/chat-history/${session.user.id}`
+    );
+
+    const data = await response.json();
+
+    const formattedMessages = data.map((msg) => ({
+      sender: msg.role === "assistant" ? "DigiT" : "You",
+      text: msg.content
+    }));
+
+    // KEEP INITIAL SYSTEM MESSAGE IF NO HISTORY
+
+    if (formattedMessages.length > 0) {
+
+      setChat(formattedMessages);
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Failed to load chat history:",
+      error
+    );
+  }
+};
+  useEffect(() => {
+
+    if (session?.user?.id) {
+
+      loadChatHistory();
+
+    }
+
+  }, [session]);
   // ==================================================
   // SIDEBAR
   // ==================================================
@@ -308,16 +350,26 @@ try {
           setIdentity({
 
               personality:
-              profile.stable_traits?.join(" • ")
-              || "Unknown",
+
+              profile.stable_traits &&
+              profile.stable_traits.length > 0
+
+              ? profile.stable_traits.join(" • ")
+
+              : "Adaptive",
 
               emotional:
               profile.emotional_state
               || "Neutral",
 
               drivers:
-              profile.core_drivers?.join(" • ")
-              || "Undefined",
+
+              profile.core_drivers &&
+              profile.core_drivers.length > 0
+
+              ? profile.core_drivers.join(" • ")
+
+              : "Learning About You",
 
               focus:
               profile.current_focus
