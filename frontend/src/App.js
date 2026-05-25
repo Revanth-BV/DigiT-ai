@@ -74,6 +74,8 @@ function App({ session }) {
 
     }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [session]);
   // ==================================================
   // SIDEBAR
