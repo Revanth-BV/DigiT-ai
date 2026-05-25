@@ -33,119 +33,114 @@ function App({ session }) {
 
   const [loading, setLoading] = useState(false);
   
-  const loadChatHistory = async () => {
-
-  if (!session?.user?.id) return;
-
-  try {
-
-    const response = await fetch(
-      `https://digit-ai-production.up.railway.app/chat-history/${session.user.id}`
-    );
-
-    const data = await response.json();
-
-    const formattedMessages = data.map((msg) => ({
-      sender: msg.role === "assistant" ? "DigiT" : "You",
-      text: msg.content
-    }));
-
-    // KEEP INITIAL SYSTEM MESSAGE IF NO HISTORY
-
-    if (formattedMessages.length > 0) {
-
-      setChat(formattedMessages);
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Failed to load chat history:",
-      error
-    );
-  }
-};
     useEffect(() => {
 
-      const fetchHistory = async () => {
+      const loadHistory = async () => {
 
-        if (session?.user?.id) {
+        if (!session?.user?.id) return;
 
-          await loadChatHistory();
+        try {
 
+          const response = await fetch(
+            `https://digit-ai-production.up.railway.app/chat-history/${session.user.id}`
+          );
+
+          const data = await response.json();
+
+          const formattedMessages = data.map((msg) => ({
+
+            sender:
+              msg.role === "assistant"
+                ? "DigiT"
+                : "You",
+
+            text: msg.content
+
+          }));
+
+          if (formattedMessages.length > 0) {
+
+            setChat(formattedMessages);
+
+          }
+
+        } catch (error) {
+
+          console.error(
+            "Failed to load chat history:",
+            error
+          );
         }
-
       };
 
-      fetchHistory();
+      loadHistory();
 
     }, [session]);
-  // ==================================================
-  // SIDEBAR
-  // ==================================================
+      // ==================================================
+      // SIDEBAR
+      // ==================================================
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+      const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // ==================================================
-  // MODES
-  // ==================================================
+      // ==================================================
+      // MODES
+      // ==================================================
 
-  const [focusMode, setFocusMode] = useState(false);
+      const [focusMode, setFocusMode] = useState(false);
 
-  const [emotionMode, setEmotionMode] = useState("calm");
+      const [emotionMode, setEmotionMode] = useState("calm");
 
-  // ==================================================
-  // IDENTITY
-  // ==================================================
+      // ==================================================
+      // IDENTITY
+      // ==================================================
 
-  const [identity, setIdentity] = useState({
+      const [identity, setIdentity] = useState({
 
-  personality: "Reflective • Analytical",
+      personality: "Reflective • Analytical",
 
-  emotional: "Neutral",
+      emotional: "Neutral",
 
-  drivers: "Growth",
+      drivers: "Growth",
 
-  focus: "Self exploration",
+      focus: "Self exploration",
 
-  trend: "Stable",
+      trend: "Stable",
 
-  confidence: 50,
+      confidence: 50,
 
-  stress: 50
-});
+      stress: 50
+    });
 
-  // ==================================================
-  // SIDEBAR PULSE
-  // ==================================================
+      // ==================================================
+      // SIDEBAR PULSE
+      // ==================================================
 
-  const [pulse, setPulse] = useState(false);
+      const [pulse, setPulse] = useState(false);
 
-  // ==================================================
-  // AUTO SCROLL
-  // ==================================================
+      // ==================================================
+      // AUTO SCROLL
+      // ==================================================
 
-  const chatEndRef = useRef(null);
-  useEffect(() => {
+      const chatEndRef = useRef(null);
+      useEffect(() => {
 
-  const fetchProfile = async () => {
+      const fetchProfile = async () => {
 
-    const response = await fetch(
+        const response = await fetch(
 
-      `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
-    );
+          `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
+        );
 
-    const data = await response.json();
+        const data = await response.json();
 
-    setOnboardingComplete(
-      data.onboarding_completed || false
-    );
-  };
+        setOnboardingComplete(
+          data.onboarding_completed || false
+        );
+      };
 
-  fetchProfile();
+      fetchProfile();
 
-}, [session]);
+    }, [session]);
   // ==================================================
   // ONBOARDING SCREEN
   // ==================================================
