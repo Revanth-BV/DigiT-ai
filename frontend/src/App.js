@@ -66,17 +66,21 @@ function App({ session }) {
     );
   }
 };
-  useEffect(() => {
+    useEffect(() => {
 
-    if (session?.user?.id) {
+      const fetchHistory = async () => {
 
-      loadChatHistory();
+        if (session?.user?.id) {
 
-    }
+          await loadChatHistory();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+        }
 
-  }, [session]);
+      };
+
+      fetchHistory();
+
+    }, [session]);
   // ==================================================
   // SIDEBAR
   // ==================================================
