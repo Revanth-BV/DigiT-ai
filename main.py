@@ -1356,6 +1356,7 @@ async def stream_chat(req: ChatRequest):
     long_term_memory = load_long_term_memory()
 
     identity_profile = load_identity(req.user_id)
+
     # ==========================================
     # DIGIT EMOTION ENGINE
     # ==========================================
@@ -1370,6 +1371,36 @@ async def stream_chat(req: ChatRequest):
     recent_memory = memory[-10:]
 
     relevant_memories = get_relevant_memories(req.message)
+    
+    relationship_state = initialize_relationship()
+
+    relationship_state = update_relationship(
+        relationship_state,
+        req.message
+    )
+
+    advanced_presence = initialize_presence()
+
+    advanced_presence = update_presence(
+        advanced_presence,
+        emotion_state
+    )
+
+    response_style = decide_response_style(
+        emotion_state,
+        relationship_state
+    )
+
+    reflection = generate_reflection(
+        relevant_memories
+    )
+    
+    print("STREAM DEBUG")
+    print("emotion_state:", emotion_state)
+    print("relationship_state:", relationship_state)
+    print("advanced_presence:", advanced_presence)
+    print("response_style:", response_style)
+    print("reflection:", reflection)
 
     system_prompt = f"""
 You are DigiT.
@@ -1387,7 +1418,7 @@ Never sound robotic.
 IMPORTANT CONVERSATION RULES:
 
 - Keep responses concise
-- Most replies should be 1-2 sentences
+- Most replies should be 2-4 sentences
 - Avoid essays
 - Avoid sounding like a therapist
 - Avoid motivational speeches
