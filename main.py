@@ -1,6 +1,11 @@
 from supabase import create_client
 from email import message
 
+from core.emotion_engine import (
+    initialize_emotion_state,
+    update_emotion_state
+    )
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -1052,10 +1057,11 @@ def chat(req: ChatRequest):
 
     memory.append(user_message)
     save_chat_message(
-    req.user_id,
-    "assistant",
-    reply
-)
+        req.user_id,
+        "user",
+        req.message
+    )
+    
     # MEMORY EXTRACTION
 
     extract_important_memory(req.message)
@@ -1077,6 +1083,17 @@ def chat(req: ChatRequest):
     identity_profile = load_identity(req.user_id)
 
     relevant_memories = get_relevant_memories(req.message)
+    
+    # ==========================================
+    # DIGIT EMOTION ENGINE
+    # ==========================================
+
+    emotion_state = initialize_emotion_state()
+
+    emotion_state = update_emotion_state(
+        emotion_state,
+        req.message
+    )
 
     # RECENT MEMORY
 
@@ -1086,7 +1103,7 @@ def chat(req: ChatRequest):
     # DIGIT SYSTEM PROMPT
     # ==========================================
 
-    system_prompt = """
+    system_prompt = f"""
 You are DigiT.
 
 You are the user's evolving digital twin.
@@ -1142,6 +1159,19 @@ CURRENT USER IDENTITY PROFILE:
 {json.dumps(identity_profile, indent=2)}
 CURRENT PRESENCE STATE:
 {json.dumps(presence_state, indent=2)}
+
+Current Emotional State:
+- Primary Emotion:
+{emotion_state["primary_emotion"]}
+
+- Emotional Intensity:
+{emotion_state["intensity"]}
+
+- Curiosity:
+{emotion_state["curiosity"]}
+
+- Attachment:
+{emotion_state["attachment"]}
 
 CONVERSATIONAL BEHAVIOR RULES:
 
@@ -1248,11 +1278,22 @@ async def stream_chat(req: ChatRequest):
     long_term_memory = load_long_term_memory()
 
     identity_profile = load_identity(req.user_id)
+    # ==========================================
+    # DIGIT EMOTION ENGINE
+    # ==========================================
+
+    emotion_state = initialize_emotion_state()
+
+    emotion_state = update_emotion_state(
+        emotion_state,
+        req.message
+    )
+    
     recent_memory = memory[-10:]
 
     relevant_memories = get_relevant_memories(req.message)
 
-    system_prompt = """
+    system_prompt = f"""
 You are DigiT.
 
 You are the user's evolving digital twin.
@@ -1291,6 +1332,20 @@ CURRENT USER IDENTITY PROFILE:
 {json.dumps(identity_profile, indent=2)}
 CURRENT PRESENCE STATE:
 {json.dumps(presence_state, indent=2)}
+
+Current Emotional State:
+
+- Primary Emotion:
+{emotion_state["primary_emotion"]}
+
+- Emotional Intensity:
+{emotion_state["intensity"]}
+
+- Curiosity:
+{emotion_state["curiosity"]}
+
+- Attachment:
+{emotion_state["attachment"]}
 
 CONVERSATIONAL BEHAVIOR RULES:
 
