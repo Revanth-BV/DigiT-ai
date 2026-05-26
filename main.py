@@ -589,7 +589,7 @@ Do NOT include notes.
 
 Return ONLY this schema:
 
-{
+{{
   "stable_traits": [],
   "emotional_state": "",
   "core_drivers": [],
@@ -599,7 +599,7 @@ Return ONLY this schema:
   "confidence_level": 50,
   "stress_level": 50,
   "onboarding_completed": true
-}
+}}
 
 CURRENT IDENTITY:
 {identity}
