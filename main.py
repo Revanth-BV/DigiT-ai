@@ -1367,11 +1367,13 @@ async def stream_chat(req: ChatRequest):
         emotion_state,
         req.message
     )
-    
+
     recent_memory = memory[-10:]
 
-    relevant_memories = get_relevant_memories(req.message)
-    
+    relevant_memories = get_relevant_memories(
+        req.message
+    )
+
     relationship_state = initialize_relationship()
 
     relationship_state = update_relationship(
