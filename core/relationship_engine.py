@@ -1,0 +1,57 @@
+# ==========================================
+# DIGIT RELATIONSHIP ENGINE
+# ==========================================
+
+def initialize_relationship():
+
+    return {
+
+        "trust": 0.5,
+
+        "familiarity": 0.4,
+
+        "emotional_depth": 0.3,
+
+        "attachment": 0.2,
+
+        "openness": 0.5
+    }
+
+
+def update_relationship(
+    relationship,
+    user_message
+):
+
+    msg = user_message.lower()
+
+    if any(word in msg for word in [
+
+        "feel",
+        "trust",
+        "personal",
+        "afraid",
+        "love"
+
+    ]):
+
+        relationship[
+            "emotional_depth"
+        ] += 0.04
+
+        relationship[
+            "trust"
+        ] += 0.03
+
+    relationship["familiarity"] += 0.01
+
+    # LIMITS
+
+    for key in relationship:
+
+        relationship[key] = max(
+            0,
+            min(1, relationship[key])
+        )
+
+    return relationship

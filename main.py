@@ -1,10 +1,4 @@
 from supabase import create_client
-from email import message
-
-from core.emotion_engine import (
-    initialize_emotion_state,
-    update_emotion_state
-    )
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +6,38 @@ from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
 from fastapi.responses import StreamingResponse
+
+from core.emotion_engine import (
+    initialize_emotion_state,
+    update_emotion_state
+)
+
+from core.relationship_engine import (
+    initialize_relationship,
+    update_relationship
+)
+
+from core.presence_engine import (
+    initialize_presence,
+    update_presence
+)
+
+from core.identity_engine import (
+    initialize_identity
+)
+
+from core.decision_engine import (
+    decide_response_style
+)
+
+from core.reflection_engine import (
+    generate_reflection
+)
+
+from core.memory_engine import (
+    create_memory_object,
+    calculate_memory_importance
+)
 
 import json
 import os
@@ -208,18 +234,28 @@ def load_identity(user_id):
 
         return response.data[0]
 
-    return {
+    base_identity = initialize_identity()
 
-        "stable_traits": [],
+    base_identity.update({
+
         "emotional_state": "Neutral",
+
         "core_drivers": [],
+
         "current_focus": "Exploring",
+
         "behavior_patterns": [],
+
         "emotional_trend": "Stable",
+
         "confidence_level": 50,
+
         "stress_level": 50,
+
         "onboarding_completed": False
-    }
+    })
+
+    return base_identity
 
 def save_identity(user_id, identity):
 
@@ -474,17 +510,6 @@ def get_relevant_memories(user_message):
             "timestamp": time.time()
         }
 
-        if any(
-
-        word in memory_text
-
-        for word in user_message.lower().split()
-        ):
-
-            score += 3
-
-            scored_memories.append((score, memory))
-
         # KEYWORD MATCH BOOST
 
         for word in message_lower.split():
@@ -523,7 +548,7 @@ def update_identity_profile(user_message,user_id):
 
     identity = load_identity(user_id)
 
-    analysis_prompt = """
+    analysis_prompt = f"""
 You are an advanced psychological identity analyzer.
 
 Analyze the user's message deeply.
@@ -1061,7 +1086,7 @@ def chat(req: ChatRequest):
         "user",
         req.message
     )
-    
+
     # MEMORY EXTRACTION
 
     extract_important_memory(req.message)
@@ -1094,6 +1119,47 @@ def chat(req: ChatRequest):
         emotion_state,
         req.message
     )
+    
+    # ==========================================
+    # RELATIONSHIP ENGINE
+    # ==========================================
+
+    relationship_state = initialize_relationship()
+
+    relationship_state = update_relationship(
+        relationship_state,
+        req.message
+    )
+    
+    # ==========================================
+    # ADVANCED PRESENCE ENGINE
+    # ==========================================
+
+    advanced_presence = initialize_presence()
+
+    advanced_presence = update_presence(
+        advanced_presence,
+        emotion_state
+    )
+    
+    # ==========================================
+    # DECISION ENGINE
+    # ==========================================
+
+    response_style = decide_response_style(
+        emotion_state,
+        relationship_state
+    )
+
+    # ==========================================
+    # REFLECTION ENGINE
+    # ==========================================
+
+    reflection = generate_reflection(
+        relevant_memories
+    )
+
+
 
     # RECENT MEMORY
 
@@ -1159,6 +1225,18 @@ CURRENT USER IDENTITY PROFILE:
 {json.dumps(identity_profile, indent=2)}
 CURRENT PRESENCE STATE:
 {json.dumps(presence_state, indent=2)}
+
+CURRENT RELATIONSHIP STATE:
+{json.dumps(relationship_state, indent=2)}
+
+ADVANCED PRESENCE STATE:
+{json.dumps(advanced_presence, indent=2)}
+
+CURRENT RESPONSE STYLE:
+{json.dumps(response_style, indent=2)}
+
+CURRENT INTERNAL REFLECTION:
+{reflection}
 
 Current Emotional State:
 - Primary Emotion:
