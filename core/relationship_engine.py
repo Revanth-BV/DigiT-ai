@@ -109,3 +109,5 @@ def update_relationship(
             0,
             min(1, float(relationship[key]))
         )
+
+    return relationship
