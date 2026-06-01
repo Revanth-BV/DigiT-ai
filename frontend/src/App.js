@@ -62,6 +62,12 @@ function App({ session }) {
 
             setChat(formattedMessages);
 
+            setTimeout(() => {
+
+              scrollToBottom();
+
+            }, 100);
+
           }
 
         } catch (error) {
@@ -122,6 +128,20 @@ function App({ session }) {
       // ==================================================
 
       const chatEndRef = useRef(null);
+      const scrollToBottom = () => {
+
+        chatEndRef.current?.scrollIntoView({
+          behavior: "smooth"
+        });
+
+      };
+
+      useEffect(() => {
+
+        scrollToBottom();
+
+      }, [chat]);   
+
       useEffect(() => {
 
       const fetchProfile = async () => {
