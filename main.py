@@ -1415,6 +1415,9 @@ RELEVANT MEMORIES:
 LONG TERM MEMORY:
 {long_term_memory}
 
+INTERNAL OBSERVATIONS:
+{json.dumps(recent_thoughts, indent=2)}
+
 CURRENT USER IDENTITY PROFILE:
 {json.dumps(identity_profile, indent=2)}
 CURRENT PRESENCE STATE:
