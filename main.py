@@ -580,6 +580,30 @@ def save_reflection_memory(
 
     }).execute()
 
+def save_reflection_if_new(
+    user_id,
+    reflection
+):
+
+    if not reflection:
+        return
+
+    existing = load_reflections(
+        user_id
+    )
+
+    exists = any(
+        r["reflection"] ==
+        reflection["reflection"]
+        for r in existing
+    )
+
+    if not exists:
+
+        save_reflection_memory(
+            user_id,
+            reflection
+        )
 
 # ==========================================
 # MEMORY EXTRACTION
@@ -1362,11 +1386,12 @@ def chat(req: ChatRequest):
             req.message
         )
     )
-    if internal_thought:
-
-        recent_thoughts = load_recent_thoughts(
+    
+    recent_thoughts = load_recent_thoughts(
             req.user_id
         )
+
+    if internal_thought:
 
         exists = any(
             t["thought"] == internal_thought["thought"]
@@ -1385,7 +1410,7 @@ def chat(req: ChatRequest):
         )
     )
 
-    save_reflection_memory(
+    save_reflection_if_new(
         req.user_id,
         reflection_memory
     )
@@ -1471,7 +1496,11 @@ def chat(req: ChatRequest):
         relevant_memories
     )
 
-
+    recent_reflections = (
+        load_reflections(
+            req.user_id
+        )
+    )
 
     # RECENT MEMORY
 
@@ -1672,12 +1701,11 @@ async def stream_chat(req: ChatRequest):
             req.message
         )
     )
-
-    if internal_thought:
-
-        recent_thoughts = load_recent_thoughts(
+    
+    recent_thoughts = load_recent_thoughts(
             req.user_id
         )
+    if internal_thought:
 
         exists = any(
             t["thought"] == internal_thought["thought"]
@@ -1711,10 +1739,15 @@ async def stream_chat(req: ChatRequest):
         )
     )
 
-    save_reflection_memory(
+    save_reflection_if_new(
         req.user_id,
         reflection_memory
     )
+
+    recent_reflections = load_reflections(
+    req.user_id
+    )
+
     # ==========================================
     # DIGIT EMOTION ENGINE
     # ==========================================
@@ -1810,6 +1843,12 @@ RELEVANT MEMORIES:
 
 LONG TERM MEMORY:
 {long_term_memory}
+
+INTERNAL OBSERVATIONS:
+{json.dumps(recent_thoughts, indent=2)}
+
+REFLECTION MEMORIES:
+{json.dumps(recent_reflections, indent=2)}
 
 CURRENT USER IDENTITY PROFILE:
 {json.dumps(identity_profile, indent=2)}
