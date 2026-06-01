@@ -7,6 +7,10 @@ from openai import OpenAI
 from dotenv import load_dotenv
 from fastapi.responses import StreamingResponse
 
+from core.thought_engine import (
+    generate_internal_thought
+)
+
 from core.emotion_engine import (
     initialize_emotion_state,
     update_emotion_state
@@ -370,6 +374,7 @@ def save_presence(user_id, presence):
     supabase.table("presence_states") \
         .upsert(safe_presence) \
         .execute()
+    
 def load_relationship(user_id):
 
     response = (
@@ -435,6 +440,50 @@ def save_relationship(
         safe_relationship
     ).execute()
 
+def save_internal_thought(
+    user_id,
+    thought
+):
+
+    if not thought:
+        return
+
+    supabase.table(
+        "internal_thoughts"
+    ).insert({
+
+        "user_id": user_id,
+
+        "thought":
+        thought["thought"],
+
+        "category":
+        thought["category"],
+
+        "importance":
+        thought["importance"]
+
+    }).execute()
+
+def load_recent_thoughts(
+    user_id
+):
+
+    response = (
+
+        supabase
+        .table("internal_thoughts")
+        .select("*")
+        .eq("user_id", user_id)
+        .order(
+            "created_at",
+            desc=True
+        )
+        .limit(10)
+        .execute()
+    )
+
+    return response.data
 
 # ==========================================
 # MEMORY EXTRACTION
@@ -1212,6 +1261,17 @@ def chat(req: ChatRequest):
         req.user_id
         )
     
+    internal_thought = (
+        generate_internal_thought(
+            req.message
+        )
+    )
+
+    save_internal_thought(
+        req.user_id,
+        internal_thought
+    )
+
     presence_state = update_presence_state(
         req.message,
         req.user_id
@@ -1222,7 +1282,11 @@ def chat(req: ChatRequest):
     long_term_memory = load_long_term_memory()
 
     identity_profile = load_identity(req.user_id)
-
+    recent_thoughts = (
+        load_recent_thoughts(
+            req.user_id
+        )
+    )
     relevant_memories = get_relevant_memories(req.message)
     
     # ==========================================
@@ -1478,6 +1542,17 @@ async def stream_chat(req: ChatRequest):
         req.user_id
     )
 
+    internal_thought = (
+        generate_internal_thought(
+            req.message
+        )
+    )
+
+    save_internal_thought(
+        req.user_id,
+        internal_thought
+    )
+
     presence_state = update_presence_state(
         req.message,
         req.user_id
@@ -1486,6 +1561,12 @@ async def stream_chat(req: ChatRequest):
     long_term_memory = load_long_term_memory()
 
     identity_profile = load_identity(req.user_id)
+    
+    recent_thoughts = (
+        load_recent_thoughts(
+            req.user_id
+        )
+    )
 
     # ==========================================
     # DIGIT EMOTION ENGINE
