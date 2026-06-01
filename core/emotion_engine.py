@@ -58,7 +58,9 @@ def update_emotion_state(
 
         emotion_state["intensity"] += 0.1
 
-        emotion_state["attachment"] += 0.02
+        emotion_state["attachment"] = (
+            emotion_state["attachment"] * 0.95
+        ) + 0.03
 
     # ======================================
     # NEGATIVE
@@ -76,7 +78,9 @@ def update_emotion_state(
 
         emotion_state["primary_emotion"] = "concerned"
 
-        emotion_state["empathy"] += 0.1
+        emotion_state["empathy"] = (
+            emotion_state["empathy"] * 0.9
+        ) + 0.1
 
         emotion_state["mental_energy"] -= 0.05
 
@@ -96,7 +100,9 @@ def update_emotion_state(
 
         emotion_state["primary_emotion"] = "reflective"
 
-        emotion_state["curiosity"] += 0.05
+        emotion_state["curiosity"] = (
+            emotion_state["curiosity"] * 0.95
+        ) + 0.05
 
     # ======================================
     # LIMITS
@@ -118,5 +124,21 @@ def update_emotion_state(
             0,
             min(1, emotion_state[key])
         )
+
+    # ======================================
+    # EMOTIONAL RECOVERY
+    # ======================================
+
+    emotion_state["mental_energy"] += (
+        0.8 - emotion_state["mental_energy"]
+    ) * 0.02
+
+    emotion_state["emotional_fatigue"] += (
+        0.2 - emotion_state["emotional_fatigue"]
+    ) * 0.02
+
+    emotion_state["stability"] += (
+        0.7 - emotion_state["stability"]
+    ) * 0.01
 
     return emotion_state

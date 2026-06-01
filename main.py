@@ -291,7 +291,58 @@ def load_presence(user_id):
         "reflection": 50,
         "tension": 20
     }
+def load_emotion(user_id):
 
+    response = (
+        supabase
+        .table("emotion_states")
+        .select("*")
+        .eq("user_id", user_id)
+        .execute()
+    )
+
+    if response.data:
+        return response.data[0]
+
+    return initialize_emotion_state()
+
+def save_emotion(user_id, emotion):
+
+    safe_emotion = {
+
+        "user_id": user_id,
+
+        "primary_emotion":
+            emotion.get("primary_emotion"),
+
+        "secondary_emotion":
+            emotion.get("secondary_emotion"),
+
+        "intensity":
+            float(emotion.get("intensity", 0.5)),
+
+        "stability":
+            float(emotion.get("stability", 0.5)),
+
+        "curiosity":
+            float(emotion.get("curiosity", 0.5)),
+
+        "empathy":
+            float(emotion.get("empathy", 0.5)),
+
+        "mental_energy":
+            float(emotion.get("mental_energy", 0.5)),
+
+        "emotional_fatigue":
+            float(emotion.get("emotional_fatigue", 0.0)),
+
+        "attachment":
+            float(emotion.get("attachment", 0.5))
+    }
+
+    supabase.table("emotion_states") \
+        .upsert(safe_emotion) \
+        .execute()
 
 def save_presence(user_id, presence):
 
@@ -1113,11 +1164,18 @@ def chat(req: ChatRequest):
     # DIGIT EMOTION ENGINE
     # ==========================================
 
-    emotion_state = initialize_emotion_state()
+    emotion_state = load_emotion(
+        req.user_id
+    )
 
     emotion_state = update_emotion_state(
         emotion_state,
         req.message
+    )
+
+    save_emotion(
+        req.user_id,
+        emotion_state
     )
     
     # ==========================================
@@ -1361,13 +1419,20 @@ async def stream_chat(req: ChatRequest):
     # DIGIT EMOTION ENGINE
     # ==========================================
 
-    emotion_state = initialize_emotion_state()
+    emotion_state = load_emotion(
+        req.user_id
+    )
 
     emotion_state = update_emotion_state(
         emotion_state,
         req.message
     )
 
+    save_emotion(
+        req.user_id,
+        emotion_state
+    )
+    
     recent_memory = memory[-10:]
 
     relevant_memories = get_relevant_memories(
