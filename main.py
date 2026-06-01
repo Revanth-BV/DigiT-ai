@@ -510,6 +510,29 @@ def load_recent_thoughts(
 
     return response.data
 
+def save_internal_thought_if_new(
+    user_id,
+    thought
+):
+
+    if not thought:
+        return
+
+    recent_thoughts = load_recent_thoughts(
+        user_id
+    )
+
+    exists = any(
+        t["thought"] == thought["thought"]
+        for t in recent_thoughts
+    )
+
+    if not exists:
+
+        save_internal_thought(
+            user_id,
+            thought
+        )
 # ==========================================
 # MEMORY EXTRACTION
 # ==========================================
@@ -1291,11 +1314,23 @@ def chat(req: ChatRequest):
             req.message
         )
     )
+    if internal_thought:
 
-    save_internal_thought(
-        req.user_id,
-        internal_thought
-    )
+        recent_thoughts = load_recent_thoughts(
+            req.user_id
+        )
+
+        exists = any(
+            t["thought"] == internal_thought["thought"]
+            for t in recent_thoughts
+        )
+
+        if not exists:
+
+            save_internal_thought(
+                req.user_id,
+                internal_thought
+            )
 
     presence_state = update_presence_state(
         req.message,
@@ -1576,10 +1611,23 @@ async def stream_chat(req: ChatRequest):
         )
     )
 
-    save_internal_thought(
-        req.user_id,
-        internal_thought
-    )
+    if internal_thought:
+
+        recent_thoughts = load_recent_thoughts(
+            req.user_id
+        )
+
+        exists = any(
+            t["thought"] == internal_thought["thought"]
+            for t in recent_thoughts
+        )
+
+        if not exists:
+
+            save_internal_thought(
+                req.user_id,
+                internal_thought
+            )
 
     presence_state = update_presence_state(
         req.message,
