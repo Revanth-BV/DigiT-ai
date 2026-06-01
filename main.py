@@ -43,6 +43,10 @@ from core.memory_engine import (
     calculate_memory_importance
 )
 
+from core.reflection_memory_engine import (
+    generate_reflection_memory
+)
+
 import json
 import os
 import time
@@ -533,6 +537,50 @@ def save_internal_thought_if_new(
             user_id,
             thought
         )
+
+def load_reflections(
+    user_id
+):
+
+    response = (
+
+        supabase
+        .table("reflection_memories")
+        .select("*")
+        .eq("user_id", user_id)
+        .order(
+            "created_at",
+            desc=True
+        )
+        .limit(10)
+        .execute()
+    )
+
+    return response.data
+
+def save_reflection_memory(
+    user_id,
+    reflection
+):
+
+    if not reflection:
+        return
+
+    supabase.table(
+        "reflection_memories"
+    ).insert({
+
+        "user_id": user_id,
+
+        "reflection":
+        reflection["reflection"],
+
+        "confidence":
+        reflection["confidence"]
+
+    }).execute()
+
+
 # ==========================================
 # MEMORY EXTRACTION
 # ==========================================
@@ -1331,6 +1379,16 @@ def chat(req: ChatRequest):
                 req.user_id,
                 internal_thought
             )
+    reflection_memory = (
+        generate_reflection_memory(
+            recent_thoughts
+        )
+    )
+
+    save_reflection_memory(
+        req.user_id,
+        reflection_memory
+    )
 
     presence_state = update_presence_state(
         req.message,
@@ -1478,8 +1536,12 @@ LONG TERM MEMORY:
 INTERNAL OBSERVATIONS:
 {json.dumps(recent_thoughts, indent=2)}
 
+REFLECTION MEMORIES:
+{json.dumps(recent_reflections, indent=2)}
+
 CURRENT USER IDENTITY PROFILE:
 {json.dumps(identity_profile, indent=2)}
+
 CURRENT PRESENCE STATE:
 {json.dumps(presence_state, indent=2)}
 
@@ -1643,7 +1705,16 @@ async def stream_chat(req: ChatRequest):
             req.user_id
         )
     )
+    reflection_memory = (
+        generate_reflection_memory(
+            recent_thoughts
+        )
+    )
 
+    save_reflection_memory(
+        req.user_id,
+        reflection_memory
+    )
     # ==========================================
     # DIGIT EMOTION ENGINE
     # ==========================================
