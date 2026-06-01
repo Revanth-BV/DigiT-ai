@@ -25,6 +25,10 @@ def update_relationship(
 
     msg = user_message.lower()
 
+    # ======================================
+    # DEEP PERSONAL DISCUSSION
+    # ======================================
+
     if any(word in msg for word in [
 
         "feel",
@@ -35,17 +39,59 @@ def update_relationship(
 
     ]):
 
-        relationship[
-            "emotional_depth"
-        ] += 0.04
+        relationship["emotional_depth"] = (
+            relationship["emotional_depth"] * 0.95
+        ) + 0.04
 
-        relationship[
-            "trust"
-        ] += 0.03
+        relationship["trust"] = (
+            relationship["trust"] * 0.97
+        ) + 0.03
 
-    relationship["familiarity"] += 0.01
+    # ======================================
+    # GENERAL INTERACTION
+    # ======================================
 
+    relationship["familiarity"] = (
+        relationship["familiarity"] * 0.99
+    ) + 0.01
+
+    # ======================================
+    # ATTACHMENT
+    # ======================================
+
+    if any(word in msg for word in [
+
+        "thank",
+        "appreciate",
+        "helped",
+        "support"
+
+    ]):
+
+        relationship["attachment"] = (
+            relationship["attachment"] * 0.98
+        ) + 0.02
+
+    # ======================================
+    # OPENNESS
+    # ======================================
+
+    if any(word in msg for word in [
+
+        "secret",
+        "confession",
+        "honestly",
+        "truth"
+
+    ]):
+
+        relationship["openness"] = (
+            relationship["openness"] * 0.97
+        ) + 0.03
+
+    # ======================================
     # LIMITS
+    # ======================================
 
     for key in relationship:
 

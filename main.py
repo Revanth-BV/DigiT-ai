@@ -370,6 +370,71 @@ def save_presence(user_id, presence):
     supabase.table("presence_states") \
         .upsert(safe_presence) \
         .execute()
+def load_relationship(user_id):
+
+    response = (
+
+        supabase
+        .table("relationship_states")
+        .select("*")
+        .eq("user_id", user_id)
+        .execute()
+    )
+
+    if response.data:
+
+        return response.data[0]
+
+    return initialize_relationship()
+
+def save_relationship(
+    user_id,
+    relationship
+):
+
+    safe_relationship = {
+
+        "user_id": user_id,
+
+        "trust": float(
+            relationship.get("trust", 0.5)
+        ),
+
+        "familiarity": float(
+            relationship.get(
+                "familiarity",
+                0.4
+            )
+        ),
+
+        "emotional_depth": float(
+            relationship.get(
+                "emotional_depth",
+                0.3
+            )
+        ),
+
+        "attachment": float(
+            relationship.get(
+                "attachment",
+                0.2
+            )
+        ),
+
+        "openness": float(
+            relationship.get(
+                "openness",
+                0.5
+            )
+        )
+    }
+
+    supabase.table(
+        "relationship_states"
+    ).upsert(
+        safe_relationship
+    ).execute()
+
 
 # ==========================================
 # MEMORY EXTRACTION
@@ -1182,11 +1247,18 @@ def chat(req: ChatRequest):
     # RELATIONSHIP ENGINE
     # ==========================================
 
-    relationship_state = initialize_relationship()
+    relationship_state = load_relationship(
+        req.user_id
+    )
 
     relationship_state = update_relationship(
         relationship_state,
         req.message
+    )
+
+    save_relationship(
+        req.user_id,
+        relationship_state
     )
     
     # ==========================================
@@ -1432,18 +1504,25 @@ async def stream_chat(req: ChatRequest):
         req.user_id,
         emotion_state
     )
-    
+
     recent_memory = memory[-10:]
 
     relevant_memories = get_relevant_memories(
         req.message
     )
 
-    relationship_state = initialize_relationship()
+    relationship_state = load_relationship(
+        req.user_id
+    )
 
     relationship_state = update_relationship(
         relationship_state,
         req.message
+    )
+
+    save_relationship(
+        req.user_id,
+        relationship_state
     )
 
     advanced_presence = initialize_presence()
