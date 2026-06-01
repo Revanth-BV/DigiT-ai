@@ -93,11 +93,19 @@ def update_relationship(
     # LIMITS
     # ======================================
 
-    for key in relationship:
+    numeric_keys = [
+
+        "trust",
+        "familiarity",
+        "emotional_depth",
+        "attachment",
+        "openness"
+
+    ]
+
+    for key in numeric_keys:
 
         relationship[key] = max(
             0,
-            min(1, relationship[key])
+            min(1, float(relationship[key]))
         )
-
-    return relationship

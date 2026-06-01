@@ -388,7 +388,32 @@ def load_relationship(user_id):
 
     if response.data:
 
-        return response.data[0]
+        row = response.data[0]
+
+        return {
+
+            "trust": row.get("trust", 0.5),
+
+            "familiarity": row.get(
+                "familiarity",
+                0.4
+            ),
+
+            "emotional_depth": row.get(
+                "emotional_depth",
+                0.3
+            ),
+
+            "attachment": row.get(
+                "attachment",
+                0.2
+            ),
+
+            "openness": row.get(
+                "openness",
+                0.5
+            )
+        }
 
     return initialize_relationship()
 
