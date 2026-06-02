@@ -47,6 +47,10 @@ from core.reflection_memory_engine import (
     generate_reflection_memory
 )
 
+from core.belief_engine import (
+    generate_belief
+)
+
 import json
 import os
 import time
@@ -604,6 +608,76 @@ def save_reflection_if_new(
             user_id,
             reflection
         )
+def save_belief(
+    user_id,
+    belief
+):
+
+    if not belief:
+        return
+
+    supabase.table(
+        "beliefs"
+    ).insert({
+
+        "user_id": user_id,
+
+        "belief":
+        belief["belief"],
+
+        "confidence":
+        belief["confidence"]
+
+    }).execute()
+
+def load_beliefs(
+    user_id
+):
+
+    response = (
+
+        supabase
+        .table("beliefs")
+        .select("*")
+        .eq("user_id", user_id)
+        .order(
+            "created_at",
+            desc=True
+        )
+        .limit(10)
+        .execute()
+    )
+
+    return response.data
+
+def save_belief_if_new(
+    user_id,
+    belief
+):
+
+    if not belief:
+        return
+
+    existing = load_beliefs(
+        user_id
+    )
+
+    exists = any(
+
+        b["belief"] ==
+        belief["belief"]
+
+        for b in existing
+
+    )
+
+    if not exists:
+
+        save_belief(
+            user_id,
+            belief
+        )
+
 
 # ==========================================
 # MEMORY EXTRACTION
@@ -1501,6 +1575,19 @@ def chat(req: ChatRequest):
             req.user_id
         )
     )
+    
+    recent_beliefs = load_beliefs(
+        req.user_id
+    )
+    
+    belief = generate_belief(
+        recent_reflections
+    )
+
+    save_belief_if_new(
+        req.user_id,
+        belief
+    )
 
     # RECENT MEMORY
 
@@ -1567,6 +1654,9 @@ INTERNAL OBSERVATIONS:
 
 REFLECTION MEMORIES:
 {json.dumps(recent_reflections, indent=2)}
+
+BELIEFS:
+{json.dumps(recent_beliefs, indent=2)}
 
 CURRENT USER IDENTITY PROFILE:
 {json.dumps(identity_profile, indent=2)}
@@ -1746,6 +1836,15 @@ async def stream_chat(req: ChatRequest):
 
     recent_reflections = load_reflections(
     req.user_id
+    )
+
+    belief = generate_belief(
+        recent_reflections
+    )
+
+    save_belief_if_new(
+        req.user_id,
+        belief
     )
 
     # ==========================================
