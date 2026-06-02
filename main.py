@@ -1411,7 +1411,6 @@ class IdentitySaveRequest(BaseModel):
 
     identity: dict
 
-
 @app.post("/save-identity")
 
 async def save_identity_route(req: IdentitySaveRequest):
@@ -1423,6 +1422,59 @@ async def save_identity_route(req: IdentitySaveRequest):
 
     return {
         "status": "saved"
+    }
+
+@app.post("/run-cognition/{user_id}")
+
+def run_cognition(
+    user_id: str
+):
+
+    recent_thoughts = (
+        load_recent_thoughts(
+            user_id
+        )
+    )
+
+    reflection_memory = (
+        generate_reflection_memory(
+            recent_thoughts
+        )
+    )
+
+    save_reflection_if_new(
+        user_id,
+        reflection_memory
+    )
+
+    recent_reflections = (
+        load_reflections(
+            user_id
+        )
+    )
+
+    belief = generate_belief(
+        recent_reflections
+    )
+
+    save_belief_if_new(
+        user_id,
+        belief
+    )
+
+    return {
+
+        "thought_count":
+        len(recent_thoughts),
+
+        "reflection":
+        reflection_memory,
+
+        "belief":
+        belief,
+
+        "status":
+        "cognition completed"
     }
 
 @app.post("/chat")
