@@ -51,6 +51,10 @@ from core.belief_engine import (
     generate_belief
 )
 
+from core.memory_ranking_engine import (
+    calculate_memory_score
+)
+
 import json
 import os
 import time
@@ -677,6 +681,34 @@ def save_belief_if_new(
             user_id,
             belief
         )
+
+def load_top_memories(
+    user_id
+):
+
+    response = (
+
+        supabase
+        .table("long_term_memories")
+        .select("*")
+        .eq("user_id", user_id)
+        .execute()
+
+    )
+
+    memories = response.data
+
+    memories.sort(
+
+        key=lambda m:
+        calculate_memory_score(m),
+
+        reverse=True
+
+    )
+
+    return memories[:10]
+
 
 
 # ==========================================
@@ -1402,6 +1434,16 @@ def get_chat_history(user_id: str):
         .execute()
 
     return result.data
+
+@app.get("/top-memories/{user_id}")
+
+def get_top_memories(
+    user_id: str
+):
+
+    return load_top_memories(
+        user_id
+    )
 # ==========================================
 # CHAT ROUTE
 # ==========================================
