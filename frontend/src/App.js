@@ -20,7 +20,7 @@ function App({ session }) {
   // ==================================================
   // CHAT
   // ==================================================
-
+  const [reflecting, setReflecting] = useState(false);
   const [message, setMessage] = useState("");
 
   const [chat, setChat] = useState([
@@ -442,6 +442,83 @@ try {
   }
 };
 
+const runCognition = async () => {
+
+  try {
+
+    setReflecting(true);
+
+    const response = await fetch(
+
+      `https://digit-ai-production.up.railway.app/run-cognition/${session.user.id}`,
+
+      {
+        method: "POST"
+      }
+    );
+
+    const data = await response.json();
+
+    setChat(prev => [
+
+      ...prev,
+
+      {
+
+        sender: "DigiT",
+
+        text:
+
+          `🧠 Reflection Complete\n\n` +
+
+          `Reflection:\n${
+
+            data.reflection?.reflection ||
+
+            "No new reflection"
+
+          }\n\n` +
+
+          `Belief:\n${
+
+            data.belief?.belief ||
+
+            "No new belief"
+
+          }`
+      }
+
+    ]);
+
+    setTimeout(() => {
+
+      chatEndRef.current?.scrollIntoView({
+        behavior: "smooth"
+      });
+
+    }, 100);
+
+  } catch (error) {
+
+    console.error(error);
+
+    setChat(prev => [
+
+      ...prev,
+
+      {
+        sender: "System",
+        text: "Unable to run cognition cycle."
+      }
+
+    ]);
+
+  } finally {
+
+    setReflecting(false);
+  }
+};
+
   // ==================================================
   // MAIN UI
   // ==================================================
@@ -623,6 +700,23 @@ try {
               }
 
             </button>
+            <button
+              className="mode-button"
+              onClick={runCognition}
+              disabled={reflecting}
+            >
+
+              {
+
+                reflecting
+
+                  ? "Reflecting..."
+
+                  : "🧠 Reflect"
+
+              }
+
+            </button>
 
             {/* EMOTION MODES */}
 
@@ -639,13 +733,14 @@ try {
             >
               Intense
             </button>
-
+            
             <button
               className="emotion-button"
               onClick={() => setEmotionMode("night")}
             >
               <FaMoon />
             </button>
+
             <button
               className="emotion-button"
               onClick={async () => {
@@ -657,6 +752,7 @@ try {
             >
               Logout
             </button>
+
           </div>
 
         </div>
