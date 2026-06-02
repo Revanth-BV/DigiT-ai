@@ -189,39 +189,32 @@ def load_long_term_memory():
     with open(LONG_TERM_MEMORY_FILE, "r") as file:
         return json.load(file)
 
-def save_long_term_memory(memory):
+def save_long_term_memory(
+    user_id,
+    memory_object
+    ):
 
-    # ==========================================
-    # SORT BY IMPORTANCE
-    # ==========================================
+    supabase.table(
+        "long_term_memories"
+    ).insert({
 
-    sorted_memory = sorted(
+        "user_id": user_id,
 
-        memory,
+        "message":
+        memory_object["message"],
 
-        key=lambda x: x.get(
-            "importance",
-            1
-        ),
+        "emotion":
+        memory_object["emotion"],
 
-        reverse=True
-    )
+        "importance":
+        memory_object["importance"],
 
-    # ==========================================
-    # KEEP MOST IMPORTANT
-    # ==========================================
+        "repetition_count": 1,
 
-    MAX_LONG_TERM = 120
+        "emotional_weight":
+        0.5
 
-    trimmed_memory = sorted_memory[:MAX_LONG_TERM]
-
-    with open(LONG_TERM_MEMORY_FILE, "w") as file:
-
-        json.dump(
-            trimmed_memory,
-            file,
-            indent=4
-        )
+    }).execute()
 
 def load_personality():
 
@@ -709,7 +702,19 @@ def load_top_memories(
 
     return memories[:10]
 
+def load_long_term_memory(user_id):
 
+    response = (
+
+        supabase
+        .table("long_term_memories")
+        .select("*")
+        .eq("user_id", user_id)
+        .execute()
+
+    )
+
+    return response.data
 
 # ==========================================
 # MEMORY EXTRACTION
@@ -719,11 +724,16 @@ def load_top_memories(
 # MEMORY INTELLIGENCE ENGINE
 # ==========================================
 
-def extract_important_memory(message):
+def extract_important_memory(
+    user_id,
+    message
+    ):
 
     message_lower = message.lower()
 
-    memories = load_long_term_memory()
+    memories = load_long_term_memory(
+        user_id
+    )
 
     # ==========================================
     # IMPORTANCE DETECTION
@@ -851,7 +861,10 @@ def extract_important_memory(message):
 
         memories.append(memory_object)
 
-        save_long_term_memory(memories)
+        save_long_term_memory(
+            user_id,
+            memory_object
+        )
 
 # ==========================================
 # RELEVANT MEMORY RETRIEVAL
@@ -1542,7 +1555,10 @@ def chat(req: ChatRequest):
 
     # MEMORY EXTRACTION
 
-    extract_important_memory(req.message)
+    extract_important_memory(
+        req.user_id,
+        req.message
+    )
 
     update_identity_profile(
         req.message,
@@ -1596,7 +1612,9 @@ def chat(req: ChatRequest):
     
     # LOAD LONG TERM MEMORY
 
-    long_term_memory = load_long_term_memory()
+    long_term_memory = load_long_term_memory(
+        req.user_id
+    )
 
     identity_profile = load_identity(req.user_id)
     recent_thoughts = (
@@ -1879,7 +1897,10 @@ async def stream_chat(req: ChatRequest):
         req.message
     )
 
-    extract_important_memory(req.message)
+    extract_important_memory(
+        req.user_id,
+        req.message
+    )
 
     update_identity_profile(
         req.message,
@@ -1914,7 +1935,9 @@ async def stream_chat(req: ChatRequest):
         req.user_id
     )
 
-    long_term_memory = load_long_term_memory()
+    long_term_memory = load_long_term_memory(
+        req.user_id
+    )
 
     identity_profile = load_identity(req.user_id)
     
