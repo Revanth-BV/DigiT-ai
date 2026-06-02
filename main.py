@@ -181,14 +181,6 @@ def save_chat_message(user_id, role, content):
 
     }).execute()
 
-def load_long_term_memory():
-
-    if not os.path.exists(LONG_TERM_MEMORY_FILE):
-        return []
-
-    with open(LONG_TERM_MEMORY_FILE, "r") as file:
-        return json.load(file)
-
 def save_long_term_memory(
     user_id,
     memory_object
@@ -870,79 +862,14 @@ def extract_important_memory(
 # RELEVANT MEMORY RETRIEVAL
 # ==========================================
 
-def get_relevant_memories(user_message):
+def get_relevant_memories(
+    user_id,
+    user_message
+    ):
 
-    memories = load_long_term_memory()
-
-    if not memories:
-
-        return []
-
-    message_lower = user_message.lower()
-
-    scored_memories = []
-
-    for memory in memories:
-
-    # ==========================================
-    # BACKWARD COMPATIBILITY
-    # ==========================================
-
-        if isinstance(memory, str):
-
-            memory = {
-
-            "message": memory,
-
-            "emotion": "neutral",
-
-            "importance": 1,
-
-            "timestamp": time.time()
-        }
-
-        score = memory.get("importance", 1)
-
-        memory_text = memory.get("message", "").lower()
-        
-        if isinstance(memory, str):
-
-            memory = {
-            "message": memory,
-            "emotion": "neutral",
-            "importance": 1,
-            "timestamp": time.time()
-        }
-
-        # KEYWORD MATCH BOOST
-
-        for word in message_lower.split():
-
-            if word in memory_text:
-
-                score += 2
-
-        scored_memories.append(
-            (score, memory)
-        )
-
-    # SORT BY SCORE
-
-    scored_memories.sort(
-        reverse=True,
-        key=lambda x: x[0]
+    memories = load_long_term_memory(
+        user_id
     )
-
-    # RETURN TOP MEMORIES
-
-    top_memories = [
-
-        mem[1]["message"]
-
-        for mem in scored_memories[:5]
-    ]
-
-    return top_memories
 
 # ==========================================
 # AI IDENTITY ANALYZER
@@ -1622,7 +1549,10 @@ def chat(req: ChatRequest):
             req.user_id
         )
     )
-    relevant_memories = get_relevant_memories(req.message)
+    relevant_memories = get_relevant_memories(
+        req.user_id,
+        req.message
+    )
     
     # ==========================================
     # DIGIT EMOTION ENGINE
@@ -1997,6 +1927,7 @@ async def stream_chat(req: ChatRequest):
     recent_memory = memory[-10:]
 
     relevant_memories = get_relevant_memories(
+        req.user_id,
         req.message
     )
 
