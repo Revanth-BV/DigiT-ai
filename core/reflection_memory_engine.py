@@ -29,7 +29,7 @@ def generate_reflection_memory(
         "reflection"
     )
 
-    if ambition_count >= 3:
+    if ambition_count >= 1:
 
         return {
 
@@ -40,7 +40,7 @@ def generate_reflection_memory(
             0.8
         }
 
-    if emotional_count >= 3:
+    if emotional_count >= 1:
 
         return {
 
@@ -51,7 +51,7 @@ def generate_reflection_memory(
             0.75
         }
 
-    if reflection_count >= 3:
+    if reflection_count >= 1:
 
         return {
 

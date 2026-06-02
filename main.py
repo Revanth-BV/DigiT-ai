@@ -1484,6 +1484,12 @@ def chat(req: ChatRequest):
         )
     )
 
+    print("===== THOUGHTS =====")
+    print(recent_thoughts)
+
+    print("===== REFLECTION =====")
+    print(reflection_memory)
+
     save_reflection_if_new(
         req.user_id,
         reflection_memory
@@ -1828,6 +1834,12 @@ async def stream_chat(req: ChatRequest):
             recent_thoughts
         )
     )
+
+    print("===== THOUGHTS =====")
+    print(recent_thoughts)
+
+    print("===== REFLECTION =====")
+    print(reflection_memory)
 
     save_reflection_if_new(
         req.user_id,
