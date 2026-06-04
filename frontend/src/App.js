@@ -19,6 +19,7 @@ function App({ session }) {
   // ==================================================
 
   const [onboardingComplete, setOnboardingComplete] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
   // ==================================================
   // CHAT
   // ==================================================
@@ -148,20 +149,40 @@ console.log("USER ID:", session?.user?.id);
 
       }, [chat]);   
 
-      useEffect(() => {
+    useEffect(() => {
 
       const fetchProfile = async () => {
 
-        const response = await fetch(
+        try {
 
-          `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
-        );
+          if (!session?.user?.id) return;
 
-        const data = await response.json();
+          const response = await fetch(
 
-        setOnboardingComplete(
-          data.onboarding_completed || false
-        );
+            `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
+          );
+
+          const data = await response.json();
+
+          console.log("PROFILE DATA:", data);
+
+          setOnboardingComplete(
+            data?.onboarding_completed === true
+          );
+
+        } catch (error) {
+
+          console.error(
+            "Profile Load Error:",
+            error
+          );
+
+          setOnboardingComplete(false);
+
+        } finally {
+
+          setLoadingProfile(false);
+        }
       };
 
       fetchProfile();
@@ -170,85 +191,46 @@ console.log("USER ID:", session?.user?.id);
   // ==================================================
   // ONBOARDING SCREEN
   // ==================================================
+if (loadingProfile) {
 
-    if (!onboardingComplete) {
+  return (
 
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        color: "white"
+      }}
+    >
+      Loading DigiT...
+    </div>
+
+  );
+}
+    if (onboardingComplete === false) {
+      const [onboardingComplete, setOnboardingComplete] =
+        useState(false);
       return (
 
         <Onboarding
         onComplete={async (answers) => {
 
-        console.log("User Answers:", answers);
+          console.log(
+            "ONBOARDING COMPLETE"
+          );
 
-      // ==========================================
-      // LOAD EXISTING IDENTITY
-      // ==========================================
+          console.log(
+            "ANSWERS:",
+            answers
+          );
 
-      const response = await fetch(
+          // TEMPORARY TEST
 
-        `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
-      );
+          setOnboardingComplete(true);
+        }}
 
-      let identity = await response.json();
-
-      if (!identity || Object.keys(identity).length === 0) {
-
-        identity = {
-
-          stable_traits: [],
-
-          emotional_state: "neutral",
-
-          core_drivers: [],
-
-          current_focus: "Getting Started",
-
-          behavior_patterns: [],
-
-          emotional_trend: "stable",
-
-          confidence_level: 50,
-
-          stress_level: 50,
-
-          onboarding_completed: true
-        };
-
-      } else {
-
-        identity.onboarding_completed = true;
-      }
-
-      // ==========================================
-      // SAVE UPDATED PROFILE
-      // ==========================================
-
-      await fetch(
-
-        "https://digit-ai-production.up.railway.app/save-identity",
-
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-
-            user_id: session.user.id,
-
-            identity
-          })
-        }
-      );
-
-      // ==========================================
-      // COMPLETE
-      // ==========================================
-
-      setOnboardingComplete(true);
-    }}
   />
     );
   }
