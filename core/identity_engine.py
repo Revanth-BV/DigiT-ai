@@ -10,17 +10,35 @@ def initialize_identity():
 
             "Adaptive",
             "Reflective"
+
         ],
 
         "communication_style":
             "Calm and observant",
 
-        "core_values": [
+        "emotional_state":
+            "Neutral",
+
+        "core_drivers": [
 
             "Growth",
             "Understanding",
             "Connection"
+
         ],
 
-        "personality_evolution": 0.1
+        "current_focus":
+            "Exploring",
+
+        "behavior_patterns": [],
+
+        "emotional_trend":
+            "Stable",
+
+        "confidence_level": 50,
+
+        "stress_level": 50,
+
+        "onboarding_completed": False
+
     }

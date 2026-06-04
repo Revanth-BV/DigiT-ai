@@ -289,33 +289,22 @@ def load_identity(user_id):
 
     base_identity = initialize_identity()
 
-    base_identity.update({
-
-        "emotional_state": "Neutral",
-
-        "core_drivers": [],
-
-        "current_focus": "Exploring",
-
-        "behavior_patterns": [],
-
-        "emotional_trend": "Stable",
-
-        "confidence_level": 50,
-
-        "stress_level": 50,
-
-        "onboarding_completed": False
-
-    })
-
     save_identity(
         user_id,
         base_identity
     )
 
     return base_identity
+    try:
 
+        save_identity(user_id, base_identity)
+
+    except Exception as e:
+
+        print("IDENTITY CREATE ERROR:")
+        print(str(e))
+        raise
+    
 def save_identity(user_id, identity):
 
     identity["user_id"] = user_id
