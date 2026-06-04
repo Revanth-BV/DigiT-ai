@@ -83,7 +83,14 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origins=[
+
+    "http://localhost:3000",
+
+    "https://digit-ai-ten.vercel.app",
+
+    "https://digit-ai-rbv.vercel.app"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -303,7 +310,11 @@ def load_identity(user_id):
         "onboarding_completed": False
     })
 
-    return base_identity
+    identity = load_identity(user_id)
+
+    save_identity(user_id, identity)
+
+    return identity
 
 def save_identity(user_id, identity):
 

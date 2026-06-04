@@ -183,13 +183,35 @@ function App({ session }) {
         `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
       );
 
-      const identity = await response.json();
+      let identity = await response.json();
 
-      // ==========================================
-      // UPDATE ONBOARDING STATUS
-      // ==========================================
+      if (!identity || Object.keys(identity).length === 0) {
 
-      identity.onboarding_completed = true;
+        identity = {
+
+          stable_traits: [],
+
+          emotional_state: "neutral",
+
+          core_drivers: [],
+
+          current_focus: "Getting Started",
+
+          behavior_patterns: [],
+
+          emotional_trend: "stable",
+
+          confidence_level: 50,
+
+          stress_level: 50,
+
+          onboarding_completed: true
+        };
+
+      } else {
+
+        identity.onboarding_completed = true;
+      }
 
       // ==========================================
       // SAVE UPDATED PROFILE
