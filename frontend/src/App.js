@@ -34,10 +34,6 @@ function App({ session }) {
     }
   ]);
 
-console.log("SESSION:", session);
-console.log("USER:", session?.user);
-console.log("USER ID:", session?.user?.id);
-
   const [loading, setLoading] = useState(false);
   
     useEffect(() => {
@@ -164,8 +160,6 @@ console.log("USER ID:", session?.user?.id);
 
           const data = await response.json();
 
-          console.log("PROFILE DATA:", data);
-
           setOnboardingComplete(
             data?.onboarding_completed === true
           );
@@ -213,19 +207,36 @@ if (onboardingComplete === false) {
 
   return (
 
-    <Onboarding
-      onComplete={async (answers) => {
+  <Onboarding
+    onComplete={async (answers) => {
 
-        console.log("ONBOARDING START");
-        console.log("ANSWERS:", answers);
+      console.log("User Answers:", answers);
 
-        alert("Onboarding Complete Triggered");
+      const response = await fetch(
+        `https://digit-ai-production.up.railway.app/identity/${session.user.id}`
+      );
 
-        setOnboardingComplete(true);
+      let identity = await response.json();
 
-        console.log("ONBOARDING END");
-      }}
-    />
+      identity.onboarding_completed = true;
+
+      await fetch(
+        "https://digit-ai-production.up.railway.app/save-identity",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user_id: session.user.id,
+            identity
+          })
+        }
+      );
+
+      setOnboardingComplete(true);
+    }}
+  />
 
   );
 }

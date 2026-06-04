@@ -295,15 +295,6 @@ def load_identity(user_id):
     )
 
     return base_identity
-    try:
-
-        save_identity(user_id, base_identity)
-
-    except Exception as e:
-
-        print("IDENTITY CREATE ERROR:")
-        print(str(e))
-        raise
     
 def save_identity(user_id, identity):
 
