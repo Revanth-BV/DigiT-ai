@@ -56,6 +56,10 @@ from core.memory_ranking_engine import (
     calculate_memory_score
 )
 
+from core.prediction_engine import (
+    generate_prediction
+)
+
 import json
 import os
 import time
@@ -709,6 +713,76 @@ def save_belief_if_new(
             user_id,
             belief
         )
+
+def save_prediction(
+    user_id,
+    prediction
+):
+
+    if not prediction:
+        return
+
+    supabase.table(
+        "predictions"
+    ).insert({
+
+        "user_id": user_id,
+
+        "prediction":
+        prediction["prediction"],
+
+        "confidence":
+        prediction["confidence"]
+
+    }).execute()
+
+def load_predictions(
+    user_id
+):
+
+    response = (
+
+        supabase
+        .table("predictions")
+        .select("*")
+        .eq("user_id", user_id)
+        .order(
+            "created_at",
+            desc=True
+        )
+        .limit(10)
+        .execute()
+    )
+
+    return response.data
+
+def save_prediction_if_new(
+    user_id,
+    prediction
+):
+
+    if not prediction:
+        return
+
+    existing = load_predictions(
+        user_id
+    )
+
+    exists = any(
+
+        p["prediction"] ==
+        prediction["prediction"]
+
+        for p in existing
+    )
+
+    if not exists:
+
+        save_prediction(
+            user_id,
+            prediction
+        )
+    
 
 def load_top_memories(
     user_id
@@ -1496,7 +1570,19 @@ def run_cognition(
         user_id,
         belief
     )
+    recent_beliefs = load_beliefs(
+        user_id
+    )
 
+    prediction = generate_prediction(
+        recent_beliefs
+    )
+
+    save_prediction_if_new(
+        user_id,
+        prediction
+    )
+    
     return {
 
         "thought_count":
