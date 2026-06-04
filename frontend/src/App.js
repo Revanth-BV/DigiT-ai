@@ -209,31 +209,26 @@ if (loadingProfile) {
 
   );
 }
-    if (onboardingComplete === false) {
-      const [onboardingComplete, setOnboardingComplete] =
-        useState(false);
-      return (
+if (onboardingComplete === false) {
 
-        <Onboarding
-        onComplete={async (answers) => {
+  return (
 
-          console.log(
-            "ONBOARDING COMPLETE"
-          );
+    <Onboarding
+      onComplete={async (answers) => {
 
-          console.log(
-            "ANSWERS:",
-            answers
-          );
+        console.log("ONBOARDING START");
+        console.log("ANSWERS:", answers);
 
-          // TEMPORARY TEST
+        alert("Onboarding Complete Triggered");
 
-          setOnboardingComplete(true);
-        }}
+        setOnboardingComplete(true);
 
-  />
-    );
-  }
+        console.log("ONBOARDING END");
+      }}
+    />
+
+  );
+}
 
   // ==================================================
   // SEND MESSAGE

@@ -60,10 +60,28 @@ function Onboarding({ onComplete }) {
     else {
 
       setBuildingTwin(true);
-
+      console.log(
+        "TYPE OF onComplete:",
+        typeof onComplete
+      );
       setTimeout(() => {
 
-        onComplete(updatedAnswers);
+        console.log(
+          "TYPE OF onComplete:",
+          typeof onComplete
+        );
+
+        if (typeof onComplete === "function") {
+
+          onComplete(updatedAnswers);
+
+        } else {
+
+          console.error(
+            "onComplete is not a function",
+            onComplete
+          );
+        }
 
       }, 3500);
     }
