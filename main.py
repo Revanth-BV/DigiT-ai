@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
 from fastapi.responses import StreamingResponse
+from datetime import datetime
 
 from core.thought_engine import (
     generate_internal_thought
@@ -186,27 +187,72 @@ def save_long_term_memory(
     memory_object
     ):
 
-    supabase.table(
-        "long_term_memories"
-    ).insert({
+    existing = (
 
-        "user_id": user_id,
+        supabase
+        .table("long_term_memories")
+        .select("*")
+        .eq(
+            "user_id",
+            user_id
+        )
+        .eq(
+            "message",
+            memory_object["message"]
+        )
+        .execute()
 
-        "message":
-        memory_object["message"],
+    )
 
-        "emotion":
-        memory_object["emotion"],
+    if existing.data:
 
-        "importance":
-        memory_object["importance"],
+        memory = existing.data[0]
 
-        "repetition_count": 1,
+        supabase.table(
+            "long_term_memories"
+        ).update({
 
-        "emotional_weight":
-        0.5
+            "repetition_count":
+                memory.get(
+                    "repetition_count",
+                    1
+                ) + 1,
 
-    }).execute()
+                "last_recalled":
+                datetime.utcnow().isoformat()
+
+        }).eq(
+
+            "id",
+            memory["id"]
+
+        ).execute()
+
+    else:
+
+        supabase.table(
+            "long_term_memories"
+        ).insert({
+
+            "user_id": user_id,
+
+            "message":
+                memory_object["message"],
+
+            "emotion":
+                memory_object["emotion"],
+
+            "importance":
+                memory_object["importance"],
+
+            "repetition_count": 1,
+
+            "emotional_weight":
+                memory_object[
+                    "emotional_weight"
+                ]
+
+        }).execute()
 
 def load_personality():
 
@@ -728,6 +774,20 @@ def extract_important_memory(
     )
 
     # ==========================================
+    # EMOTIONAL WEIGHT
+    # ==========================================
+
+    emotional_weight = 0.5
+
+    if emotion == "positive":
+
+        emotional_weight = 0.7
+
+    elif emotion == "negative":
+
+        emotional_weight = 0.8
+
+    # ==========================================
     # IMPORTANCE DETECTION
     # ==========================================
 
@@ -801,6 +861,9 @@ def extract_important_memory(
         "emotion": emotion,
 
         "importance": importance,
+
+        "emotional_weight":
+            emotional_weight,
 
         "timestamp": time.time()
     }
@@ -1539,7 +1602,7 @@ def chat(req: ChatRequest):
     
     # LOAD LONG TERM MEMORY
 
-    long_term_memory = load_long_term_memory(
+    long_term_memory = load_top_memories(
         req.user_id
     )
 
@@ -1865,7 +1928,7 @@ async def stream_chat(req: ChatRequest):
         req.user_id
     )
 
-    long_term_memory = load_long_term_memory(
+    long_term_memory = load_top_memories(
         req.user_id
     )
 
