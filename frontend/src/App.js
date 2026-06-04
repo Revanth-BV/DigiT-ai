@@ -472,19 +472,18 @@ const runCognition = async () => {
           `🧠 Reflection Complete\n\n` +
 
           `Reflection:\n${
-
-            data.reflection?.reflection ||
-
-            "No new reflection"
-
+              data.reflection?.reflection ||
+              "No reflection"
           }\n\n` +
 
           `Belief:\n${
+              data.belief?.belief ||
+              "No belief"
+          }\n\n` +
 
-            data.belief?.belief ||
-
-            "No new belief"
-
+          `🔮 Prediction:\n${
+              data.prediction?.prediction ||
+              "No prediction"
           }`
       }
 
