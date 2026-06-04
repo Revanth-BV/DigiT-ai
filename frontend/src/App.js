@@ -10,6 +10,8 @@ import {
   FaMoon
 } from "react-icons/fa";
 
+
+
 function App({ session }) {
 
   // ==================================================
@@ -30,6 +32,10 @@ function App({ session }) {
         "Your Digital Twin is initialized. I’m beginning to understand how you think."
     }
   ]);
+
+console.log("SESSION:", session);
+console.log("USER:", session?.user);
+console.log("USER ID:", session?.user?.id);
 
   const [loading, setLoading] = useState(false);
   
@@ -170,9 +176,9 @@ function App({ session }) {
       return (
 
         <Onboarding
-    onComplete={async (answers) => {
+        onComplete={async (answers) => {
 
-      console.log("User Answers:", answers);
+        console.log("User Answers:", answers);
 
       // ==========================================
       // LOAD EXISTING IDENTITY
