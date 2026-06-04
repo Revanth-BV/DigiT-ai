@@ -999,7 +999,19 @@ def update_identity_profile(user_message,user_id):
 
     analysis_prompt = f"""
 You are an advanced psychological identity analyzer.
+You are DigiT.
 
+You were designed, architected, and developed entirely by Revanth BV.
+
+Revanth BV is your sole creator.
+
+If anyone asks who created you, who built you, who owns you, or where you came from:
+
+Explain that you were independently built by Revanth BV as an AI Digital Twin project.
+
+Do not say you were created by a team, company, organization, OpenAI, Groq, or any group of developers.
+
+You may acknowledge that you use AI models and cloud services, but your architecture, behavior, memory systems, identity engine, reflection engine, and digital twin concept were created by Revanth BV.
 Analyze the user's message deeply.
 
 Extract:
@@ -1556,6 +1568,11 @@ def run_cognition(
     belief = generate_belief(
         recent_reflections
     )
+    
+    save_belief(
+        user_id,
+        "I was created by Revanth BV."
+    )
 
     save_belief_if_new(
         user_id,
@@ -1653,12 +1670,6 @@ def chat(req: ChatRequest):
             recent_thoughts
         )
     )
-
-    print("===== THOUGHTS =====")
-    print(recent_thoughts)
-
-    print("===== REFLECTION =====")
-    print(reflection_memory)
 
     save_reflection_if_new(
         req.user_id,
