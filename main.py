@@ -277,7 +277,6 @@ def load_personality():
 def load_identity(user_id):
 
     response = (
-
         supabase
         .table("identity_profiles")
         .select("*")
@@ -286,7 +285,6 @@ def load_identity(user_id):
     )
 
     if response.data:
-
         return response.data[0]
 
     base_identity = initialize_identity()
@@ -308,13 +306,15 @@ def load_identity(user_id):
         "stress_level": 50,
 
         "onboarding_completed": False
+
     })
 
-    identity = load_identity(user_id)
+    save_identity(
+        user_id,
+        base_identity
+    )
 
-    save_identity(user_id, identity)
-
-    return identity
+    return base_identity
 
 def save_identity(user_id, identity):
 
