@@ -1582,7 +1582,7 @@ def run_cognition(
         user_id,
         prediction
     )
-    
+
     return {
 
         "thought_count":
@@ -1593,6 +1593,9 @@ def run_cognition(
 
         "belief":
         belief,
+
+        "prediction":
+        prediction,
 
         "status":
         "cognition completed"
