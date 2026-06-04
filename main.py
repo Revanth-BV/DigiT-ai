@@ -247,10 +247,7 @@ def save_long_term_memory(
 
             "repetition_count": 1,
 
-            "emotional_weight":
-                memory_object[
-                    "emotional_weight"
-                ]
+            "emotional_weight": memory_object["emotional_weight"],
 
         }).execute()
 
@@ -778,14 +775,7 @@ def extract_important_memory(
     # ==========================================
 
     emotional_weight = 0.5
-
-    if emotion == "positive":
-
-        emotional_weight = 0.7
-
-    elif emotion == "negative":
-
-        emotional_weight = 0.8
+    emotion = "neutral"
 
     # ==========================================
     # IMPORTANCE DETECTION
