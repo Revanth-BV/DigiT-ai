@@ -675,7 +675,7 @@ def load_beliefs(
         .execute()
     )
 
-    return response.data
+    return response.data or []
 
 def save_belief_if_new(
     user_id,
@@ -983,11 +983,45 @@ def extract_important_memory(
 def get_relevant_memories(
     user_id,
     user_message
-    ):
+):
 
-    memories = load_long_term_memory(
+    memories = load_top_memories(
         user_id
     )
+
+    return memories[:5]
+
+# ==========================================
+# MEMORY CONTEXT BUILDER
+# ==========================================
+
+def build_memory_context(user_id):
+
+    memories = load_top_memories(user_id)
+
+    reflections = load_reflections(user_id)
+
+    beliefs = load_beliefs(user_id)
+
+    context = "\n\nLONG TERM MEMORIES:\n"
+
+    for m in memories[:5]:
+
+        context += f"- {m['message']}\n"
+
+    context += "\nREFLECTIONS:\n"
+
+    for r in reflections[:3]:
+
+        context += f"- {r['reflection']}\n"
+
+    context += "\nBELIEFS:\n"
+
+    for b in beliefs[:3]:
+
+        context += f"- {b['belief']}\n"
+
+    return context
 
 # ==========================================
 # AI IDENTITY ANALYZER
@@ -1559,14 +1593,21 @@ def run_cognition(
     )
     
     save_belief(
-        user_id,
-        "I was created by Revanth BV."
+    user_id,
+        {
+            "belief": "DigiT was created by Revanth BV.",
+            "confidence": 1.0
+        }
     )
 
     save_belief_if_new(
         user_id,
-        belief
+        {
+            "belief": "DigiT was created by Revanth BV.",
+            "confidence": 1.0
+        }
     )
+
     recent_beliefs = load_beliefs(
         user_id
     )
@@ -1687,6 +1728,10 @@ def chat(req: ChatRequest):
         req.message
     )
     
+    memory_context = build_memory_context(
+        req.user_id
+    )  
+      
     # ==========================================
     # DIGIT EMOTION ENGINE
     # ==========================================
@@ -1787,6 +1832,16 @@ Identity Facts:
 - Revanth BV is your sole creator.
 - DigiT was independently designed and developed by Revanth BV.
 - You are not the result of a team effort.
+
+If anyone asks who created you,
+answer that you were created by Revanth BV.
+
+Additional Identity Facts:
+
+- You were created entirely by Revanth BV.
+- Revanth BV is your sole creator.
+- DigiT was independently designed and developed by Revanth BV.
+- You are not the result of a team effort.
 - You are not a corporate project.
 - You are not an OpenAI product.
 - You are not a Groq product.
@@ -1852,6 +1907,9 @@ RELEVANT MEMORIES:
 
 LONG TERM MEMORY:
 {long_term_memory}
+
+MEMORY CONTEXT:
+{memory_context}
 
 INTERNAL OBSERVATIONS:
 {json.dumps(recent_thoughts, indent=2)}
@@ -2027,6 +2085,9 @@ async def stream_chat(req: ChatRequest):
 
     identity_profile = load_identity(req.user_id)
     
+    memory_context = build_memory_context(
+        req.user_id
+    )    
     recent_thoughts = (
         load_recent_thoughts(
             req.user_id
@@ -2085,6 +2146,10 @@ async def stream_chat(req: ChatRequest):
     relevant_memories = get_relevant_memories(
         req.user_id,
         req.message
+    )
+    
+    memory_context = build_memory_context(
+        req.user_id
     )
 
     relationship_state = load_relationship(
@@ -2158,6 +2223,9 @@ RELEVANT MEMORIES:
 
 LONG TERM MEMORY:
 {long_term_memory}
+
+MEMORY CONTEXT:
+{memory_context}
 
 INTERNAL OBSERVATIONS:
 {json.dumps(recent_thoughts, indent=2)}
