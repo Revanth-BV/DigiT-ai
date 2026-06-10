@@ -12,7 +12,23 @@ def generate_reflection(
 
     recent = memories[-3:]
 
-    combined = " ".join(recent)
+    texts = []
+
+    for memory in recent:
+
+        if isinstance(memory, dict):
+
+            texts.append(
+                memory.get("message", "")
+            )
+
+        else:
+
+            texts.append(
+                str(memory)
+            )
+
+    combined = " ".join(texts)
 
     if "stress" in combined:
 
